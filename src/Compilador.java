@@ -1,5 +1,6 @@
 import lexico.Thompson;
 import lexico.AFN;
+import lexico.AFD;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -10,8 +11,9 @@ public class Compilador {
         Scanner in = new Scanner(System.in);
         ArrayList<AFN> afns = new ArrayList<AFN>();
         Thompson thomp = new Thompson();
+        AFD afd = new AFD();
         while(continuar){
-            System.out.println("\nEliga opcion:\n1. Basico\n2. Unir\n3. Concatenar\n4. Cerradura mas\n5. Cerradura de Kleene\n6. Opcional\n0. Salir");
+            System.out.println("\nEliga opcion:\n1. Basico\n2. Unir\n3. Concatenar\n4. Cerradura mas\n5. Cerradura de Kleene\n6. Opcional\n7. Convertir a AFD\n0. Salir");
             opcion = in.nextInt();
             int inAFN0, inAFN1;
             switch(opcion){
@@ -51,6 +53,10 @@ public class Compilador {
                     inAFN0 = in.nextInt();
                     afns.set(inAFN0, thomp.opcional(afns.get(inAFN0)));
                     break;
+                case 7:
+                    System.out.println("\nIntroduzca el indice del AFN");
+                    inAFN0 = in.nextInt();
+                    afd.crearAFD(afns.get(inAFN0));
                 case 0:
                     System.out.println("\nAdios");
                     continuar = false;

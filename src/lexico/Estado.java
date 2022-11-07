@@ -58,5 +58,6 @@ public class Estado {
         this.edoAcept = edoAcept;
         this.token = token;
         this.edos = edos;
+        this.id = contId++;
     }
 }
