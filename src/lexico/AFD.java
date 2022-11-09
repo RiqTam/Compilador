@@ -11,6 +11,27 @@ import java.io.IOException;
 
 public class AFD {
 
+    public AFN unirAFNs(HashSet<AFN> afns){
+        Estado edo = new Estado(false, -1);
+        AFN afn = new AFN();
+        for(AFN afnT : afns){
+            Transicion trans = new Transicion('\0', afnT.getEdoIn());
+            edo.setTrans(trans);
+            for(Estado edoT : afnT.getEdos()){
+                afn.setEdo(edoT);
+            }
+            for(Estado edoA : afnT.getEdosAcept()){
+                afn.setEdoAcept(edoA);
+            }
+            for(char simb : afnT.getAlfabeto()){
+                afn.setSimb(simb);
+            }
+        }
+        afn.setEdoIn(edo);
+        afn.setEdo(edo);
+        return afn;
+    }
+
     public HashSet<Estado> cEpsilon(HashSet<Estado> edos, int edoId){
         HashSet<Estado> edosEpsilon = new HashSet<Estado>();
         Stack<Estado> pilaEdos = new Stack<Estado>();
@@ -59,13 +80,12 @@ public class AFD {
     }
 
     public void crearAFD(AFN afn){
-        HashSet<Estado> edos = new HashSet<Estado>();
         HashSet<Estado> edosAux = new HashSet<Estado>();
         Queue<HashSet<Estado>> colaEdos = new LinkedList<>();
         HashSet<HashSet<Estado>> conjuntoEdos = new HashSet<HashSet<Estado>>();
         ArrayList<Estado> edosAFD = new ArrayList<Estado>();
 
-        edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
+        HashSet<Estado> edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
         colaEdos.add(edos);
         conjuntoEdos.add(edos);
         Estado edoInAFD = new Estado(false, -1, edos);
@@ -140,14 +160,6 @@ public class AFD {
             for(Transicion trans : edo.getTrans()){
                 tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimb()] = edosAFD.lastIndexOf(trans.getEdo());
                 tabla[edosAFD.lastIndexOf(edo)][127] = edo.getToken();
-            }
-        }
-
-        for(int i = 0; i < edosAFD.size(); i++){
-            System.out.println("\nEstado "+i);
-            for(int j = 0; j < 128; j++){
-                System.out.println("\nAscii "+j);
-                System.out.println(tabla[i][j]);
             }
         }
 

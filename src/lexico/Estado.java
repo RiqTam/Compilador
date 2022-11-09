@@ -37,6 +37,9 @@ public class Estado {
         this.edoAcept = edoAcept;
     }
 
+    public void setToken(int token){
+        this.token = token;
+    }
     public void setEdos(HashSet<Estado> edos){
         this.edos = edos;
     }
