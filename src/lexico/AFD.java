@@ -11,27 +11,6 @@ import java.io.IOException;
 
 public class AFD {
 
-    public AFN unirAFNs(HashSet<AFN> afns){
-        Estado edo = new Estado(false, -1);
-        AFN afn = new AFN();
-        for(AFN afnT : afns){
-            Transicion trans = new Transicion('\0', afnT.getEdoIn());
-            edo.setTrans(trans);
-            for(Estado edoT : afnT.getEdos()){
-                afn.setEdo(edoT);
-            }
-            for(Estado edoA : afnT.getEdosAcept()){
-                afn.setEdoAcept(edoA);
-            }
-            for(char simb : afnT.getAlfabeto()){
-                afn.setSimb(simb);
-            }
-        }
-        afn.setEdoIn(edo);
-        afn.setEdo(edo);
-        return afn;
-    }
-
     public HashSet<Estado> cEpsilon(HashSet<Estado> edos, int edoId){
         HashSet<Estado> edosEpsilon = new HashSet<Estado>();
         Stack<Estado> pilaEdos = new Stack<Estado>();
@@ -79,13 +58,14 @@ public class AFD {
         return edosIrA;
     }
 
-    public void crearAFD(AFN afn){
+    public void crearAFD(AFN afn, String guardar){
+        HashSet<Estado> edos = new HashSet<Estado>();
         HashSet<Estado> edosAux = new HashSet<Estado>();
         Queue<HashSet<Estado>> colaEdos = new LinkedList<>();
         HashSet<HashSet<Estado>> conjuntoEdos = new HashSet<HashSet<Estado>>();
         ArrayList<Estado> edosAFD = new ArrayList<Estado>();
 
-        HashSet<Estado> edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
+        edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
         colaEdos.add(edos);
         conjuntoEdos.add(edos);
         Estado edoInAFD = new Estado(false, -1, edos);
@@ -107,7 +87,6 @@ public class AFD {
                         if(edo.getToken() != -1){
                             token = edo.getToken();
                         }
-                        System.out.println("tiene: "+edo.getId());
                     }
                     Estado edoAFD = new Estado(edoAcept, token, edosAux);
                     edosAFD.add(edoAFD);
@@ -143,12 +122,6 @@ public class AFD {
                 }
             }
         }
-        for(Estado edo : edosAFD){
-            System.out.println("\nEstado: "+edo.getId());
-            for(Estado edoP : edo.getEdos()){
-                System.out.println("Tiene: "+edoP.getId());
-            }
-        }
 
         int tabla[][] = new int[edosAFD.size()][128];
         for(int i = 0; i < edosAFD.size(); i++){
@@ -163,13 +136,10 @@ public class AFD {
             }
         }
 
-        Scanner in = new Scanner(System.in);
-        System.out.println("\nEscribe el nombre para el archivo");
-        String nombre = in.nextLine();
-        File archivo = new File(nombre+".txt");
+        File archivo = new File(guardar+".txt");
         try{
             archivo.createNewFile();
-            FileWriter fw = new FileWriter(nombre+".txt");
+            FileWriter fw = new FileWriter(guardar+".txt");
             for(int i = 0; i < edosAFD.size(); i++){
                 String linea = "";
                 for(int j = 0; j < 128; j++){

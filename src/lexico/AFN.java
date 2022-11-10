@@ -27,28 +27,20 @@ public class AFN {
         this.edoIn = edo;
     }
 
-    public void setEdo(Estado edo) {
+    public void setEdos(Estado edo) {
         this.edos.add(edo);
     }
-    
-    public void removeEdo(Estado edo){
-        this.edos.remove(edo);
-    }
 
-
-    public void setEdoAcept(Estado edo){
+    public void setEdosAcept(Estado edo){
         this.edosAcept.add(edo);
     }
 
-    public void removeEdoAcept(Estado edo){
+    public void removeEdosAcept(Estado edo){
         this.edosAcept.remove(edo);
     }
 
-    public void setSimb(char simb){
+    public void setAlfabeto(char simb){
         this.alfabeto.add(simb);
-    }
-
-    public AFN(){
     }
 
     public AFN(Estado edoIn){
