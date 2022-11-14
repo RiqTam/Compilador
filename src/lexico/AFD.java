@@ -79,7 +79,7 @@ public class AFD {
         return edosIrA;
     }
 
-    public void crearAFD(AFN afn){
+    public String crearAFD(AFN afn){
         HashSet<Estado> edosAux = new HashSet<Estado>();
         Queue<HashSet<Estado>> colaEdos = new LinkedList<>();
         HashSet<HashSet<Estado>> conjuntoEdos = new HashSet<HashSet<Estado>>();
@@ -107,7 +107,6 @@ public class AFD {
                         if(edo.getToken() != -1){
                             token = edo.getToken();
                         }
-                        System.out.println("tiene: "+edo.getId());
                     }
                     Estado edoAFD = new Estado(edoAcept, token, edosAux);
                     edosAFD.add(edoAFD);
@@ -143,12 +142,6 @@ public class AFD {
                 }
             }
         }
-        for(Estado edo : edosAFD){
-            System.out.println("\nEstado: "+edo.getId());
-            for(Estado edoP : edo.getEdos()){
-                System.out.println("Tiene: "+edoP.getId());
-            }
-        }
 
         int tabla[][] = new int[edosAFD.size()][128];
         for(int i = 0; i < edosAFD.size(); i++){
@@ -181,5 +174,36 @@ public class AFD {
         }catch(IOException e){
             e.printStackTrace();
         }
+
+        return nombre;
+        /*AFN afd = new AFN();
+        edosAFD.clear();
+        for(int i = 0; i < tabla.length; i++){
+            Estado edo;
+            if(tabla[i][127] != -1){
+                edo = new Estado(true, tabla[i][127]);
+            }else{
+                edo = new Estado(false, -1);
+            }
+            edosAFD.add(edo);
+        }
+        for(int i = 0; i < edosAFD.size(); i++){
+            Estado edo = edosAFD.get(i);
+            for(int j = 0; j < 127; j++){
+                if(tabla[i][j] != -1){
+                    Transicion trans = new Transicion((char) j, edosAFD.get(tabla[i][j]));
+                    edo.setTrans(trans);
+                    afd.setSimb((char) j);
+                }
+            }
+            if(i == 0){
+                afd.setEdoIn(edo);
+            }
+            if(edo.getEdoAcept()){
+                afd.setEdoAcept(edo);
+            }
+            afd.setEdo(edo);
+        }
+        return afd;*/
     }
 }

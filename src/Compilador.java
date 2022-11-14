@@ -1,5 +1,6 @@
 import lexico.Thompson;
 import lexico.AFN;
+import lexico.AnalizadorLexico;
 import lexico.Estado;
 import lexico.AFD;
 import java.util.Scanner;
@@ -12,12 +13,15 @@ public class Compilador {
         int opcion;
         Scanner in = new Scanner(System.in);
         ArrayList<AFN> afns = new ArrayList<AFN>();
+        ArrayList<String> afds = new ArrayList<String>();
         Thompson thomp = new Thompson();
         AFD afd = new AFD();
         while(continuar){
             System.out.println("\nElija opci\u00f3n:\n1. B\u00e1sico\n2. Unir\n3. Concatenar\n4. Cerradura transitiva" +
-            "\n5. Cerradura de Kleene\n6. Opcional\n7. Unir AFNs\n8. Convertir a AFD\n0. Salir");
+            "\n5. Cerradura de Kleene\n6. Opcional\n7. Unir AFNs\n8. Convertir a AFD\n9. Cargar AFD\n10. Probar analizador l\u00e9xico\n0. Salir");
+            System.out.println("Hay " + afns.size() + " AFNs y " + afds.size() + " AFDs");
             opcion = in.nextInt();
+            in.nextLine();
             int inAFN0, inAFN1;
             switch(opcion){
                 case 1:
@@ -58,7 +62,16 @@ public class Compilador {
                     break;
                 case 7:
                     HashSet<AFN> agregarAFNs = new HashSet<AFN>();
-                    for(AFN afn : afns){
+                    ArrayList<AFN> seleccion = new ArrayList<AFN>();
+                    int indice = -2;
+                    while(indice != -1){
+                        System.out.println("\nIntroduce el \u00edndice del AFN a unir\nIntroduce -1 para terminar");
+                        indice = in.nextInt();
+                        if(indice > -1){
+                            seleccion.add(afns.get(indice));
+                        }
+                    }
+                    for(AFN afn : seleccion){
                         System.out.println("\nIntroduzca el token del AFN " + afns.indexOf(afn));
                         int token = in.nextInt();
                         HashSet<Estado> eliminarEdos = new HashSet<Estado>();
@@ -78,13 +91,33 @@ public class Compilador {
                         }
                         agregarAFNs.add(afn);
                     }
-                    afns.clear();
+                    afns.removeAll(seleccion);
                     afns.add(afd.unirAFNs(agregarAFNs));
                     break;
                 case 8:
                     System.out.println("\nIntroduzca el \u00edndice del AFN");
                     inAFN0 = in.nextInt();
-                    afd.crearAFD(afns.get(inAFN0));
+                    afds.add(afd.crearAFD(afns.get(inAFN0)));
+                    break;
+                case 9:
+                    System.out.println("\nIntroduzca el nombre del AFD");
+                    afds.add(in.nextLine());
+                    break;
+                case 10:
+                    System.out.println("\nIntroduzca el \u00edndice del AFD");
+                    inAFN0 = in.nextInt();
+                    in.nextLine();
+                    System.out.println("\nIntroduzca la cadena a analizar");
+                    AnalizadorLexico lexico = new AnalizadorLexico(afds.get(inAFN0), in.nextLine());
+                    boolean continuarLexema = true;
+                    while(continuarLexema){
+                        int token = lexico.yylex();
+                        System.out.println("Token: " + token);
+                        System.out.println("Lexema: " + lexico.getLexema() + "\n");
+                        if(token == 0){
+                            continuarLexema = false;
+                        }
+                    }
                     break;
                 case 0:
                     System.out.println("\nAdi\u00f3s");
