@@ -15,7 +15,7 @@ public class AFD {
         Estado edo = new Estado(false, -1);
         AFN afn = new AFN();
         for(AFN afnT : afns){
-            Transicion trans = new Transicion('\0', afnT.getEdoIn());
+            Transicion trans = new Transicion('\0', '\0', afnT.getEdoIn());
             edo.setTrans(trans);
             for(Estado edoT : afnT.getEdos()){
                 afn.setEdo(edoT);
@@ -43,7 +43,7 @@ public class AFD {
                     edoActual = pilaEdos.pop();
                     edosEpsilon.add(edoActual);
                     for(Transicion trans : edoActual.getTrans()){
-                        if(trans.getSimb() == '\0'){
+                        if(trans.getSimbInf() == '\0' && trans.getSimbInf() == '\0'){
                             for(Estado edoE : edos){
                                 if(edoE.getId() == trans.getEdo().getId() && !edosEpsilon.contains(edoE)){
                                         pilaEdos.push(edoE);
@@ -61,7 +61,7 @@ public class AFD {
         HashSet<Estado> edosMover = new HashSet<Estado>();
         for(Estado edo : edos){
             for(Transicion trans : edo.getTrans()){
-                if(trans.getSimb() == simb){
+                if((int) trans.getSimbInf() <= (int) simb && (int) trans.getSimbSup() >= (int) simb){
                     edosMover.add(trans.getEdo());
                 }
             }
@@ -115,7 +115,7 @@ public class AFD {
                     for(Estado edoAct : edosAFD){
                         if(edoAct.getEdos().equals(edos)){
                             quitarEdo = edoAct;
-                            Transicion trans = new Transicion(simb, edoAFD);
+                            Transicion trans = new Transicion(simb, simb, edoAFD);
                             edoAct.setTrans(trans);
                             agregarEdo = edoAct;
                         }
@@ -130,7 +130,7 @@ public class AFD {
                             for(Estado edoTrans : edosAFD){
                                 if(edosAux.equals(edoTrans.getEdos())){
                                     quitarEdo = edoAct;
-                                    Transicion trans = new Transicion(simb, edoTrans);
+                                    Transicion trans = new Transicion(simb, simb, edoTrans);
                                     edoAct.setTrans(trans);
                                     agregarEdo = edoAct;
                                 }
@@ -151,7 +151,7 @@ public class AFD {
         }
         for(Estado edo : edosAFD){
             for(Transicion trans : edo.getTrans()){
-                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimb()] = edosAFD.lastIndexOf(trans.getEdo());
+                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimbInf()] = edosAFD.lastIndexOf(trans.getEdo());
                 tabla[edosAFD.lastIndexOf(edo)][127] = edo.getToken();
             }
         }

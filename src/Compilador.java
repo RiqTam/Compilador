@@ -25,9 +25,11 @@ public class Compilador {
             int inAFN0, inAFN1;
             switch(opcion){
                 case 1:
-                    System.out.println("\nIntroduzca el simbolo");
-                    char simb = in.next().charAt(0);
-                    afns.add(thomp.basico(simb));
+                    System.out.println("\nIntroduzca el simbolo inferior");
+                    char simbInf = in.next().charAt(0);
+                    System.out.println("\nIntroduzca el simbolo superior");
+                    char simbSup = in.next().charAt(0);
+                    afns.add(thomp.basico(simbInf, simbSup));
                     break;
                 case 2:
                     System.out.println("\nIntroduzca el \u00edndice del primer AFN");
