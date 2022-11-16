@@ -11,6 +11,27 @@ import java.io.IOException;
 
 public class AFD {
 
+    public AFN unirAFNs(HashSet<AFN> afns){
+        Estado edo = new Estado(false, -1);
+        AFN afn = new AFN();
+        for(AFN afnT : afns){
+            Transicion trans = new Transicion('\0', '\0', afnT.getEdoIn());
+            edo.setTrans(trans);
+            for(Estado edoT : afnT.getEdos()){
+                afn.setEdo(edoT);
+            }
+            for(Estado edoA : afnT.getEdosAcept()){
+                afn.setEdoAcept(edoA);
+            }
+            for(char simb : afnT.getAlfabeto()){
+                afn.setSimb(simb);
+            }
+        }
+        afn.setEdoIn(edo);
+        afn.setEdo(edo);
+        return afn;
+    }
+
     public HashSet<Estado> cEpsilon(HashSet<Estado> edos, int edoId){
         HashSet<Estado> edosEpsilon = new HashSet<Estado>();
         Stack<Estado> pilaEdos = new Stack<Estado>();
@@ -22,7 +43,7 @@ public class AFD {
                     edoActual = pilaEdos.pop();
                     edosEpsilon.add(edoActual);
                     for(Transicion trans : edoActual.getTrans()){
-                        if(trans.getSimb() == '\0'){
+                        if(trans.getSimbInf() == '\0' && trans.getSimbInf() == '\0'){
                             for(Estado edoE : edos){
                                 if(edoE.getId() == trans.getEdo().getId() && !edosEpsilon.contains(edoE)){
                                         pilaEdos.push(edoE);
@@ -40,7 +61,7 @@ public class AFD {
         HashSet<Estado> edosMover = new HashSet<Estado>();
         for(Estado edo : edos){
             for(Transicion trans : edo.getTrans()){
-                if(trans.getSimb() == simb){
+                if((int) trans.getSimbInf() <= (int) simb && (int) trans.getSimbSup() >= (int) simb){
                     edosMover.add(trans.getEdo());
                 }
             }
@@ -58,14 +79,13 @@ public class AFD {
         return edosIrA;
     }
 
-    public void crearAFD(AFN afn, String guardar){
-        HashSet<Estado> edos = new HashSet<Estado>();
+    public String crearAFD(AFN afn, String nombre){
         HashSet<Estado> edosAux = new HashSet<Estado>();
         Queue<HashSet<Estado>> colaEdos = new LinkedList<>();
         HashSet<HashSet<Estado>> conjuntoEdos = new HashSet<HashSet<Estado>>();
         ArrayList<Estado> edosAFD = new ArrayList<Estado>();
 
-        edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
+        HashSet<Estado> edos = cEpsilon(afn.getEdos(), afn.getEdoIn().getId());
         colaEdos.add(edos);
         conjuntoEdos.add(edos);
         Estado edoInAFD = new Estado(false, -1, edos);
@@ -95,7 +115,7 @@ public class AFD {
                     for(Estado edoAct : edosAFD){
                         if(edoAct.getEdos().equals(edos)){
                             quitarEdo = edoAct;
-                            Transicion trans = new Transicion(simb, edoAFD);
+                            Transicion trans = new Transicion(simb, simb, edoAFD);
                             edoAct.setTrans(trans);
                             agregarEdo = edoAct;
                         }
@@ -110,7 +130,7 @@ public class AFD {
                             for(Estado edoTrans : edosAFD){
                                 if(edosAux.equals(edoTrans.getEdos())){
                                     quitarEdo = edoAct;
-                                    Transicion trans = new Transicion(simb, edoTrans);
+                                    Transicion trans = new Transicion(simb, simb, edoTrans);
                                     edoAct.setTrans(trans);
                                     agregarEdo = edoAct;
                                 }
@@ -131,15 +151,15 @@ public class AFD {
         }
         for(Estado edo : edosAFD){
             for(Transicion trans : edo.getTrans()){
-                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimb()] = edosAFD.lastIndexOf(trans.getEdo());
+                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimbInf()] = edosAFD.lastIndexOf(trans.getEdo());
                 tabla[edosAFD.lastIndexOf(edo)][127] = edo.getToken();
             }
         }
 
-        File archivo = new File(guardar+".txt");
+        File archivo = new File(nombre+".txt");
         try{
             archivo.createNewFile();
-            FileWriter fw = new FileWriter(guardar+".txt");
+            FileWriter fw = new FileWriter(nombre+".txt");
             for(int i = 0; i < edosAFD.size(); i++){
                 String linea = "";
                 for(int j = 0; j < 128; j++){
@@ -151,5 +171,36 @@ public class AFD {
         }catch(IOException e){
             e.printStackTrace();
         }
+
+        return nombre;
+        /*AFN afd = new AFN();
+        edosAFD.clear();
+        for(int i = 0; i < tabla.length; i++){
+            Estado edo;
+            if(tabla[i][127] != -1){
+                edo = new Estado(true, tabla[i][127]);
+            }else{
+                edo = new Estado(false, -1);
+            }
+            edosAFD.add(edo);
+        }
+        for(int i = 0; i < edosAFD.size(); i++){
+            Estado edo = edosAFD.get(i);
+            for(int j = 0; j < 127; j++){
+                if(tabla[i][j] != -1){
+                    Transicion trans = new Transicion((char) j, edosAFD.get(tabla[i][j]));
+                    edo.setTrans(trans);
+                    afd.setSimb((char) j);
+                }
+            }
+            if(i == 0){
+                afd.setEdoIn(edo);
+            }
+            if(edo.getEdoAcept()){
+                afd.setEdoAcept(edo);
+            }
+            afd.setEdo(edo);
+        }
+        return afd;*/
     }
 }
