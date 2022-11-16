@@ -2,7 +2,10 @@ package pantalla;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Scanner;
 import lexico.Thompson;
+import lexico.Estado;
 import lexico.AnalizadorLexico;
 import lexico.AFN;
 import lexico.AFD;
@@ -190,7 +193,39 @@ public class Operaciones extends Frame
                 });
                 break;
             case 7:
-                
+                Scanner in = new Scanner(System.in);
+                HashSet<AFN> agregarAFNs = new HashSet<AFN>();
+                ArrayList<AFN> seleccion = new ArrayList<AFN>();
+                int indice = -2;
+                while(indice != -1){
+                    System.out.println("\nIntroduce el \u00edndice del AFN a unir\nIntroduce -1 para terminar");
+                    indice = in.nextInt();
+                    if(indice > -1){
+                        seleccion.add(afns.get(indice));
+                    }
+                }
+                for(AFN afn : seleccion){
+                    System.out.println("\nIntroduzca el token del AFN " + afns.indexOf(afn));
+                    int token = in.nextInt();
+                    HashSet<Estado> eliminarEdos = new HashSet<Estado>();
+                    HashSet<Estado> agregarEdos = new HashSet<Estado>();
+                    for(Estado edoAcept : afn.getEdosAcept()){
+                        eliminarEdos.add(edoAcept);
+                        edoAcept.setToken(token);
+                        agregarEdos.add(edoAcept);
+                    }
+                    for(Estado edo : eliminarEdos){
+                        afn.removeEdo(edo);
+                        afn.removeEdoAcept(edo);
+                    }
+                    for(Estado edo : agregarEdos){
+                        afn.setEdo(edo);
+                        afn.setEdoAcept(edo);
+                    }
+                    agregarAFNs.add(afn);
+                }
+                afns.removeAll(seleccion);
+                afns.add(afd.unirAFNs(agregarAFNs));
                 break;
             case 8:
                 setSize(500, 150);
@@ -244,7 +279,7 @@ public class Operaciones extends Frame
                 {
                     public void actionPerformed(ActionEvent e)
                     {
-                        
+                        afds.add(txtOp12.getText());
                         Ventana v = new Ventana(4);
                         v.setVisible(true);
                         dispose();
