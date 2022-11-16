@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import lexico.Thompson;
+import lexico.AnalizadorLexico;
 import lexico.AFN;
 import lexico.AFD;
 
@@ -251,17 +252,21 @@ public class Operaciones extends Frame
                 });
                 break;
             case 10:
-                setSize(500, 100);
-                setLayout(new GridLayout(3, 2));
+                setSize(500, 150);
+                setLayout(new GridLayout(4, 2));
         
                 Label lblOp29 = new Label("Analizador Lexico");
                 Label lblOp30 = new Label("");
-                Label lblOp31 = new Label("Introduzca la cadena a analizar:");
+                Label lblOp31 = new Label("Introduzca el indice del AFD:");
                 TextField txtOp13 = new TextField();
+                Label lblOp32 = new Label("Introduzca la cadena a analizar:");
+                TextField txtOp14 = new TextField();
                 add(lblOp29);
                 add(lblOp30);
                 add(lblOp31);
                 add(txtOp13);
+                add(lblOp32);
+                add(txtOp14);
 
                 Button btn5 = new Button ("Analizar");
                 add(btn5);
@@ -269,7 +274,17 @@ public class Operaciones extends Frame
                 {
                     public void actionPerformed(ActionEvent e)
                     {
-                        
+                        int inAFN0 = Integer.parseInt(txtOp13.getText());
+                        AnalizadorLexico lexico = new AnalizadorLexico(afds.get(inAFN0), txtOp14.getText());
+                        boolean continuarLexema = true;
+                        while(continuarLexema){
+                            int token = lexico.yylex();
+                            System.out.println("Token: " + token);
+                            System.out.println("Lexema: " + lexico.getLexema() + "\n");
+                            if(token == 0 || token == -10){
+                                continuarLexema = false;
+                            }
+                        }
                         Ventana v = new Ventana(4);
                         v.setVisible(true);
                         dispose();
