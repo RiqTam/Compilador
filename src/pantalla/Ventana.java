@@ -26,6 +26,11 @@ public class Ventana extends Frame
                 add(lblOp3);
                 add(btn);
                 break;
+            case 4:
+                Label lblOp4 = new Label("Guardado");
+                add(lblOp4);
+                add(btn);
+                break;
         }
         
         btn.addActionListener(new ActionListener()
