@@ -43,7 +43,7 @@ public class AFD {
                     edoActual = pilaEdos.pop();
                     edosEpsilon.add(edoActual);
                     for(Transicion trans : edoActual.getTrans()){
-                        if(trans.getSimbInf() == '\0' && trans.getSimbInf() == '\0'){
+                        if(trans.getSimbInf() == '\0' && trans.getSimbSup() == '\0'){
                             for(Estado edoE : edos){
                                 if(edoE.getId() == trans.getEdo().getId() && !edosEpsilon.contains(edoE)){
                                         pilaEdos.push(edoE);
@@ -95,7 +95,13 @@ public class AFD {
             edos = colaEdos.poll();
             for(char simb : afn.getAlfabeto()){
                 edosAux = irA(edos, afn.getEdos(), simb);
-                if(!conjuntoEdos.contains(edosAux) && !edosAux.isEmpty()){
+                boolean contiene = false;
+                for(HashSet<Estado> edosConjunto : conjuntoEdos){
+                    if(edosConjunto.equals(edosAux)){
+                        contiene = true;
+                    }
+                }
+                if(!contiene && !edosAux.isEmpty()){
                     colaEdos.add(edosAux);
                     conjuntoEdos.add(edosAux);
                     boolean edoAcept = false;
@@ -103,25 +109,22 @@ public class AFD {
                     for(Estado edo : edosAux){
                         if(edo.getEdoAcept()){
                             edoAcept = true;
-                        }
-                        if(edo.getToken() != -1){
                             token = edo.getToken();
                         }
                     }
                     Estado edoAFD = new Estado(edoAcept, token, edosAux);
-                    edosAFD.add(edoAFD);
                     Estado quitarEdo = new Estado(false, -1);
                     Estado agregarEdo = new Estado(false, -1);
+                    edosAFD.add(edoAFD);
                     for(Estado edoAct : edosAFD){
                         if(edoAct.getEdos().equals(edos)){
                             quitarEdo = edoAct;
-                            Transicion trans = new Transicion(simb, simb, edoAFD);
+                            Transicion trans = new Transicion(simb, edosAFD.lastIndexOf(edoAFD));
                             edoAct.setTrans(trans);
                             agregarEdo = edoAct;
                         }
                     }
-                    edosAFD.remove(quitarEdo);
-                    edosAFD.add(agregarEdo);
+                    edosAFD.set(edosAFD.indexOf(quitarEdo), agregarEdo);
                 }else if(!edosAux.isEmpty()){
                     Estado quitarEdo = new Estado(false, -1);
                     Estado agregarEdo = new Estado(false, -1);
@@ -130,15 +133,14 @@ public class AFD {
                             for(Estado edoTrans : edosAFD){
                                 if(edosAux.equals(edoTrans.getEdos())){
                                     quitarEdo = edoAct;
-                                    Transicion trans = new Transicion(simb, simb, edoTrans);
+                                    Transicion trans = new Transicion(simb, edosAFD.lastIndexOf(edoTrans));
                                     edoAct.setTrans(trans);
                                     agregarEdo = edoAct;
                                 }
                             }
                         }
                     }
-                    edosAFD.remove(quitarEdo);
-                    edosAFD.add(agregarEdo);
+                    edosAFD.set(edosAFD.indexOf(quitarEdo), agregarEdo);
                 }
             }
         }
@@ -149,11 +151,12 @@ public class AFD {
                 tabla[i][j] = -1;
             }
         }
+
         for(Estado edo : edosAFD){
             for(Transicion trans : edo.getTrans()){
-                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimbInf()] = edosAFD.lastIndexOf(trans.getEdo());
-                tabla[edosAFD.lastIndexOf(edo)][127] = edo.getToken();
+                tabla[edosAFD.lastIndexOf(edo)][(int) trans.getSimbInf()] = trans.getPosEdo();
             }
+                tabla[edosAFD.lastIndexOf(edo)][127] = edo.getToken();
         }
 
         Scanner in = new Scanner(System.in);

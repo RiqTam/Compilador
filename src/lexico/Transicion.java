@@ -3,6 +3,7 @@ package lexico;
 public class Transicion {
     private char simbInf, simbSup;
     private Estado edo;
+    private int posEdo;
     
     public char getSimbInf(){
         return this.simbInf;
@@ -14,6 +15,10 @@ public class Transicion {
 
     public Estado getEdo(){
         return this.edo;
+    }
+
+    public int getPosEdo(){
+        return this.posEdo;
     }
 
     public void setSimbInf(char simb){
@@ -32,5 +37,10 @@ public class Transicion {
         this.simbInf = simbInf;
         this.simbSup = simbSup;
         this.edo = edo;
+    }
+
+    public Transicion(char simb, int pos){
+        this.simbInf = simb;
+        this.posEdo = pos;
     }
 }

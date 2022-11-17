@@ -2,6 +2,7 @@ package lexico;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class AnalizadorLexico{
         boolean edoAcept;
@@ -9,6 +10,8 @@ public class AnalizadorLexico{
         int posAct = 0;
         int afd[][];
         String cadena;
+        String yytext;
+        Stack<Integer> indices = new Stack<Integer>();
 
     public int yylex(){
         iniLexema = posAct;
@@ -16,6 +19,7 @@ public class AnalizadorLexico{
         edoAcept = false;
         token = -1;
         if(this.posAct == this.cadena.length()){
+            this.yytext = null;
             return 0;
         }
         int edoAct = 0;
@@ -29,6 +33,8 @@ public class AnalizadorLexico{
                 }
             }else{
                 if(this.edoAcept){
+                    this.yytext = this.cadena.substring(iniLexema, finLexema + 1);
+                    this.indices.push(iniLexema);
                     return this.token;
                 }else{
                     return -10;
@@ -36,14 +42,20 @@ public class AnalizadorLexico{
             }
             this.posAct++;
         }
-        return this.token;
+        if(this.edoAcept){
+            this.yytext = this.cadena.substring(iniLexema, finLexema + 1);
+            this.indices.push(iniLexema);
+            return this.token;
+        }
+        return -10;
     }
 
-    public String getLexema(){
-        if(this.finLexema != -1){
-            return this.cadena.substring(iniLexema, finLexema + 1);
-        }
-        return null;
+    public String yytext(){
+        return yytext;
+    }
+
+    public void undoToken(){
+        this.posAct = this.indices.pop();
     }
 
     private int[][] createTabla(String nombreAFD){

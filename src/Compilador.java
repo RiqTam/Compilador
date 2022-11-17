@@ -6,6 +6,7 @@ import lexico.AFD;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashSet;
+import sintactico.*;
 
 public class Compilador {
     public static void main(String[] args) throws Exception {
@@ -13,16 +14,17 @@ public class Compilador {
         int opcion;
         Scanner in = new Scanner(System.in);
         ArrayList<AFN> afns = new ArrayList<AFN>();
-        ArrayList<String> afds = new ArrayList<String>();
         Thompson thomp = new Thompson();
         AFD afd = new AFD();
         while(continuar){
             System.out.println("\nElija opci\u00f3n:\n1. B\u00e1sico\n2. Unir\n3. Concatenar\n4. Cerradura transitiva" +
-            "\n5. Cerradura de Kleene\n6. Opcional\n7. Unir AFNs\n8. Convertir a AFD\n9. Cargar AFD\n10. Probar analizador l\u00e9xico\n0. Salir");
-            System.out.println("Hay " + afns.size() + " AFNs y " + afds.size() + " AFDs");
+            "\n5. Cerradura de Kleene\n6. Opcional\n7. Unir AFNs\n8. Convertir a AFD\n9. Probar analizador l\u00e9xico" +
+            "\n10. Calculadora\n11. ER a AFN\n0. Salir");
+            System.out.println("Hay " + afns.size() + " AFNs");
             opcion = in.nextInt();
             in.nextLine();
             int inAFN0, inAFN1;
+            String cadena;
             switch(opcion){
                 case 1:
                     System.out.println("\nIntroduzca el simbolo inferior");
@@ -99,26 +101,38 @@ public class Compilador {
                 case 8:
                     System.out.println("\nIntroduzca el \u00edndice del AFN");
                     inAFN0 = in.nextInt();
-                    afds.add(afd.crearAFD(afns.get(inAFN0)));
+                    afd.crearAFD(afns.get(inAFN0));
                     break;
                 case 9:
                     System.out.println("\nIntroduzca el nombre del AFD");
-                    afds.add(in.nextLine());
-                    break;
-                case 10:
-                    System.out.println("\nIntroduzca el \u00edndice del AFD");
-                    inAFN0 = in.nextInt();
-                    in.nextLine();
-                    System.out.println("\nIntroduzca la cadena a analizar");
-                    AnalizadorLexico lexico = new AnalizadorLexico(afds.get(inAFN0), in.nextLine());
+                    String nombre = in.nextLine();
+                    System.out.println("\nIngrese la cadena a analizar");
+                    AnalizadorLexico lexico = new AnalizadorLexico(nombre, in.nextLine());
                     boolean continuarLexema = true;
                     while(continuarLexema){
                         int token = lexico.yylex();
                         System.out.println("Token: " + token);
-                        System.out.println("Lexema: " + lexico.getLexema() + "\n");
+                        System.out.println("Lexema: " + lexico.yytext() + "\n");
                         if(token == 0 || token == -10){
                             continuarLexema = false;
                         }
+                    }
+                    break;
+                case 10:
+                    Calculadora calc = new Calculadora();
+                    System.out.println("\nIngrese la cadena a evaluar");
+                    cadena = in.nextLine();
+                    calc.descRec("calculadora", cadena);
+                    break;
+                case 11:
+                    ERaAFN er = new ERaAFN();
+                    System.out.println("\nIntroduzca la expresion regular");
+                    cadena = in.nextLine();
+                    AFN afnER = er.descRec("er", cadena);
+                    if(afnER != null){
+                        afns.add(afnER);
+                    }else{
+                        System.out.println("No se pudo crear");
                     }
                     break;
                 case 0:
@@ -140,7 +154,8 @@ public class Compilador {
             if(trans != null){
                 Estado edoT = trans.getEdo();
                 System.out.println("\nEstado "+edo.getId()+"\nTransición a "+edoT.getId());
-                System.out.println("Simbolo: "+trans.getSimb());
+                System.out.println("Simbolo inferior: "+trans.getSimbInf());
+                System.out.println("Simbolo superior: "+trans.getSimbSup());
             }
         }
     }
