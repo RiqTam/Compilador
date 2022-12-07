@@ -113,7 +113,7 @@ public class Compilador {
                         int token = lexico.yylex();
                         System.out.println("Token: " + token);
                         System.out.println("Lexema: " + lexico.yytext() + "\n");
-                        if(token == 0 || token == -10){
+                        if(token == 0){
                             continuarLexema = false;
                         }
                     }

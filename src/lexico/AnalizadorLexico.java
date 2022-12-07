@@ -37,6 +37,8 @@ public class AnalizadorLexico{
                     this.indices.push(iniLexema);
                     return this.token;
                 }else{
+                    this.yytext = Character.toString(this.cadena.charAt(iniLexema));
+                    this.posAct++;
                     return -10;
                 }
             }
