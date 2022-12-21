@@ -9,7 +9,7 @@ public class ERaAFN {
     String cadena, nombreAFD;
     static final int SIMB = 10;
     static final int OR = 20;
-    static final int AMPER = 30;
+    static final int CONC = 30;
     static final int MAS = 40;
     static final int KLEENE = 50;
     static final int OPC = 60;
@@ -20,7 +20,7 @@ public class ERaAFN {
     static final int GUION = 110;
 
     public AFN descRec(String nombreAFD, String cadena){
-        this.lexico = new AnalizadorLexico(nombreAFD, cadena);
+        lexico = new AnalizadorLexico(nombreAFD, cadena);
         AFN afn = new AFN();
         return E(afn);
     }
@@ -38,7 +38,7 @@ public class ERaAFN {
 
     private AFN Ep(AFN afn){
         AFN afn2 = new AFN();
-        int token = this.lexico.yylex();
+        int token = lexico.yylex();
         if(token == OR){
             afn2 = T(afn2);
             if(afn2 != null){
@@ -68,7 +68,7 @@ public class ERaAFN {
     private AFN Tp(AFN afn){
         AFN afn2 = new AFN();
         int token = lexico.yylex();
-        if(token == AMPER){
+        if(token == CONC){
             afn2 = C(afn2);
             if(afn2 != null){
                 afn = thompson.concatenar(afn, afn2);
@@ -79,7 +79,7 @@ public class ERaAFN {
             }
             return null;
         }
-        this.lexico.undoToken();
+        lexico.undoToken();
         return afn;
     }
 
@@ -139,12 +139,12 @@ public class ERaAFN {
             case CORCHETE_IZQ:
                 token = this.lexico.yylex();
                 if(token == SIMB){
-                    simb1 = lexico.yytext().charAt(0);
+                    simb1 = lexico.yytext().charAt(lexico.yytext().length() - 1);
                     token = lexico.yylex();
                     if(token == GUION){
                         token = lexico.yylex();
                         if(token == SIMB){
-                            simb2 = lexico.yytext().charAt(0);
+                            simb2 = lexico.yytext().charAt(lexico.yytext().length() - 1);
                             token = lexico.yylex();
                             if(token == CORCHETE_DER){
                                 afn = this.thompson.basico(simb1, simb2);
@@ -155,8 +155,8 @@ public class ERaAFN {
                 }
             return null;
             case SIMB:
-                simb1 = this.lexico.yytext().charAt(0);
-                afn = this.thompson.basico(simb1, simb1);
+                simb1 = lexico.yytext().charAt(lexico.yytext().length() - 1);
+                afn = thompson.basico(simb1, simb1);
                 return afn;
         }
         return null;
