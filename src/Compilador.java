@@ -6,7 +6,9 @@ import lexico.AFD;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.HashSet;
+
 import sintactico.*;
+import java.util.*;
 
 public class Compilador {
     public static void main(String[] args) throws Exception {
@@ -135,12 +137,45 @@ public class Compilador {
                         System.out.println("No se pudo crear");
                     }
                     break;
+                case 12:
+                    GdeG g = new GdeG();
+                    System.out.println("\nIngresa cadena");
+                    cadena = in.nextLine();
+                    ArrayList<Regla> reglas = g.descRec("gramatica", cadena);
+
+                    LL ll = new LL();
+                    String tabla[][] = ll.crearTabla(reglas);
+                    List<String> simbolosT = new ArrayList<String>();
+                    for(Regla regla : reglas){
+                        for(Nodo nodo : regla.getSimbolos()){
+                            if(nodo.getTerminal()){
+                                simbolosT.add(nodo.getSimbolo());
+                            }
+                        }
+                    }
+                    simbolosT = ll.quitarDuplicados(simbolosT);
+                    simbolosT.remove("epsilon");
+                    List<Integer> diccionario = new ArrayList<Integer>();
+                    for(String simb : simbolosT){
+                        System.out.println("Ingresa el token de "+simb);
+                        inAFN0 = in.nextInt();
+                        in.nextLine();
+                        diccionario.add(inAFN0);
+                    }
+                    AnalizadorLL1 ll1 = new AnalizadorLL1();
+                    System.out.println("Ingresa el nombre del AFD a utilizar");
+                    String nombreAFD = in.nextLine();
+                    System.out.println("Ingresa la cadena a analizar");
+                    cadena = in.nextLine();
+                    ll1.analizar(cadena, tabla, reglas, nombreAFD, diccionario);
+                    break;
                 case 0:
                     System.out.println("\nAdi\u00f3s");
                     continuar = false;
                     break;
             }
         }
+        in.close();
     }
 }
 

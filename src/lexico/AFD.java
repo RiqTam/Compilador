@@ -177,6 +177,7 @@ public class AFD {
         }catch(IOException e){
             e.printStackTrace();
         }
+        in.close();
 
         return nombre;
         /*AFN afd = new AFN();

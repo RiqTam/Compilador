@@ -33,7 +33,7 @@ public class AnalizadorLexico{
                 }
             }else{
                 if(this.edoAcept){
-                    this.yytext = this.cadena.substring(iniLexema, finLexema + 1);
+                    this.yytext = this.cadena.substring(iniLexema, finLexema + 1).replaceAll(" ", "");
                     this.indices.push(iniLexema);
                     return this.token;
                 }else{
@@ -45,7 +45,7 @@ public class AnalizadorLexico{
             this.posAct++;
         }
         if(this.edoAcept){
-            this.yytext = this.cadena.substring(iniLexema, finLexema + 1);
+            this.yytext = this.cadena.substring(iniLexema, finLexema + 1).replaceAll(" ", "");
             this.indices.push(iniLexema);
             return this.token;
         }
@@ -71,6 +71,7 @@ public class AnalizadorLexico{
                 count++;
             }
             tabla = new int[count][128];
+            sc.close();
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }
@@ -86,6 +87,7 @@ public class AnalizadorLexico{
                 }
                 count++;
             }
+            sc.close();
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }

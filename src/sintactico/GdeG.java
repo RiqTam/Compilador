@@ -1,5 +1,7 @@
 package sintactico;
 import lexico.AnalizadorLexico;
+import java.util.List;
+import java.util.ArrayList;
 
 public class GdeG {
     AnalizadorLexico lexico;
@@ -8,71 +10,67 @@ public class GdeG {
     static final int FLECHA = 20;
     static final int OR = 30;
     static final int PC = 40;
-    
-    public boolean descRec(String nombreAFD, String cadena){
+    ArrayList<Regla> reglas = new ArrayList<Regla>();
+
+    public ArrayList<Regla> descRec(String nombreAFD, String cadena){
         lexico = new AnalizadorLexico(nombreAFD, cadena);
-        return listaReglas();
+        if(conjReglas()){
+            terminales();
+            return reglas;
+        }
+        return null;
+    }
+
+    private boolean conjReglas(){
+        if(listaReglas()){
+            if(conjReglasP()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean conjReglasP(){
+        if(listaReglas()){
+            if(conjReglasP()){
+                return true;
+            }
+            return false;
+        }
+        return true;
     }
 
     private boolean listaReglas(){
-        if(reglas()){
-            int token = lexico.yylex();
-            if(token == PC){
-                if(listaReglasP()){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean listaReglasP(){
-        if(reglas()){
-            int token = lexico.yylex();
-            if(token == PC){
-                if(listaReglasP()){
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private boolean reglas(){
-        if(ladoIzquierdo()){
-            int token = lexico.yylex();
-            if(token == FLECHA){
-                if(ladosDerechos()){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean ladoIzquierdo(){
         int token = lexico.yylex();
         if(token == SIMB){
-            return true;
+            String ladoIzquierdo = lexico.yytext();
+            token = lexico.yylex();
+            if(token == FLECHA){
+                if(listaLadosDerechos(ladoIzquierdo)){
+                    token = lexico.yylex();
+                    if(token == PC){
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
 
-    private boolean ladosDerechos(){
-        if(secSimbolos()){
-            if(ladosDerechosP()){
+    private boolean listaLadosDerechos(String ladoIzquierdo){
+        if(ladoDerecho(ladoIzquierdo)){
+            if(listaLadosDerechosP(ladoIzquierdo)){
                 return true;
             }
         }
         return false;
     }
 
-    private boolean ladosDerechosP(){
+    private boolean listaLadosDerechosP(String ladoIzquierdo){
         int token = lexico.yylex();
         if(token == OR){
-            if(secSimbolos()){
-                if(ladosDerechos()){
+            if(ladoDerecho(ladoIzquierdo)){
+                if(listaLadosDerechosP(ladoIzquierdo)){
                     return true;
                 }
             }
@@ -82,25 +80,49 @@ public class GdeG {
         return true;
     }
 
-    private boolean secSimbolos(){
+    private boolean ladoDerecho(String ladoIzquierdo){
         int token = lexico.yylex();
+        List<Nodo> lista = new ArrayList<Nodo>();
         if(token == SIMB){
-            if(secSimbolosP()){
+            String text = lexico.yytext();
+            lista = ladoDerechoP(lista);
+            if(lista != null){
+                Nodo nodo = new Nodo(text);
+                lista.add(0, nodo);
+                Regla regla = new Regla(ladoIzquierdo, lista);
+                reglas.add(regla);
                 return true;
             }
         }
         return false;
     }
 
-    private boolean secSimbolosP(){
+    private List<Nodo> ladoDerechoP(List<Nodo> lista){
         int token = lexico.yylex();
         if(token == SIMB){
-            if(secSimbolosP()){
-                return true;
+            String text = lexico.yytext();
+            List<Nodo> listaP = ladoDerechoP(lista);
+            if(listaP != null){
+                Nodo nodo = new Nodo(text);
+                lista.add(0, nodo);
+                return lista;
             }
-            return false;
+            return null;
         }
         lexico.undoToken();
-        return true;
+        lista.clear();
+        return lista;
+    }
+
+    private void terminales(){
+        for(int i = 0; i < reglas.size(); i++){
+            for(int j = 0; j < reglas.get(i).getSimbolos().size(); j++){
+                for(int k = 0; k < reglas.size(); k++){
+                    if(reglas.get(k).getLadoIzquierdo().equals(reglas.get(i).getSimbolos().get(j).getSimbolo())){
+                        reglas.get(i).getSimbolos().get(j).setTerminal(false);
+                    }
+                }
+            }
+        }
     }
 }
